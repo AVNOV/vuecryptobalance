@@ -1,15 +1,6 @@
-<script lang="ts">
-export default {
-    beforeRouteEnter: async (to, from, next) => {
-        const coinStore = useCoinStore();
-        await coinStore.fetchCoins();
-
-        return next;
-    }
-}
-</script>
-
 <script setup lang="ts">
+import { Coin } from '~/types/coin';
+
 const props = defineProps({
     id: {
         type: String,
@@ -20,19 +11,23 @@ const props = defineProps({
 const coinStore = useCoinStore()
 const router = useRouter()
 
-const coin = computed(() => {
+const coin = ref<Coin>()
+
+onMounted(async () => {
+    await coinStore.fetchCoins();
     const ret = coinStore.getById(props.id);
 
     if (ret === null) {
         router.push({ name: "404" });
+    } else {
+        coin.value = ret;
     }
-
-    return ret
 })
+
 </script> 
 
 <template>
-    <div v-if="coin !== null" class="coin-details">
+    <div v-if="coin" class="coin-details">
         <h2>{{ coin.name }} ({{ coin.symbol }})</h2>
         <div class="details">
             <div class="field">
@@ -77,28 +72,42 @@ const coin = computed(() => {
 
 <style scoped>
 .coin-details {
-    padding: 20px;
+  background-color: #f7f7f7;
+  padding: 20px;
+  border-radius: 4px;
 }
 
 .coin-details h2 {
-    margin: 0;
+  margin: 0;
+  font-size: 24px;
+  color: #333;
 }
 
 .coin-details .details {
-    margin-top: 20px;
+  margin-top: 20px;
 }
 
 .coin-details .field {
-    display: flex;
-    margin-bottom: 10px;
+  display: flex;
+  margin-bottom: 10px;
 }
 
 .coin-details .label {
-    font-weight: bold;
-    margin-right: 5px;
+  font-weight: bold;
+  margin-right: 5px;
+  color: #555;
 }
 
 .coin-details .value {
-    font-weight: normal;
+  font-weight: normal;
+  color: #333;
+}
+
+.coin-details .value.positive {
+  color: green;
+}
+
+.coin-details .value.negative {
+  color: red;
 }
 </style>

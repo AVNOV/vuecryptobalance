@@ -1,14 +1,3 @@
-<script lang="ts">
-export default {
-    beforeRouteEnter: async (to, from, next) => {
-        const coinStore = useCoinStore();
-        await coinStore.fetchCoins();
-
-        return next;
-    }
-}
-</script>
-
 <script setup lang="ts">
 const coinStore = useCoinStore();
 
@@ -18,8 +7,9 @@ const filteredCoins = computed(() => {
         return coinStore.coins;
     }
 
-    return coinStore.coins.filter(({ id }) => id.startsWith(search.value.toLowerCase()))
+    return coinStore.coins.filter(c => c.id.toLowerCase().startsWith(search.value.toLowerCase()) || c.symbol.toLowerCase().startsWith(search.value.toLowerCase()))
 })
+
 
 const elemNb = 12
 const currentPage = ref(1)
@@ -27,10 +17,21 @@ const maxPage = computed(() => {
     return Math.ceil(filteredCoins.value.length / elemNb)
 })
 
-watch(maxPage, (val: number, prev: number) => {
-    if (val > currentPage.value && prev !== 0) {
-        console.log(val, prev)
+watch(maxPage, (val: number) => {
+    if (val > currentPage.value) {
         currentPage.value = val
+    }
+})
+
+const keepPage = ref(0);
+
+watch(search, (val: string, prev: string) => {
+    if (prev === "" && val !== "") {
+        keepPage.value = currentPage.value;
+        currentPage.value = 1;
+    }
+    if (val === "" && prev !== "") {
+        currentPage.value = keepPage.value;
     }
 })
 
@@ -49,6 +50,11 @@ const previousPage = () => {
     if (currentPage.value > 1)
         currentPage.value--;
 }
+
+onMounted(async () => {
+    await coinStore.fetchCoins();
+    currentPage.value = 1;
+})
 </script>
 
 <template>
