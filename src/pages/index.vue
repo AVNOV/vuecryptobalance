@@ -58,9 +58,9 @@ onMounted(async () => {
 </script>
 
 <template>
-    <Navbar v-model="search" />
+    <Thenavbar v-model="search" />
     <div>
-        <h1>Liste des cryptomonnaies</h1>
+        <h2 class="crypto-title"><u>Liste des cryptomonnaies :</u></h2>
         <div class="crypto-cards">
             <router-link v-for="coin in pagesItems" :key="coin.id" :to="`/coin/${coin.id}`" class="crypto-card">
                 <img :src="coin.image" :alt="coin.name" class="crypto-image" />
@@ -79,21 +79,29 @@ onMounted(async () => {
 </template>
 
 <style scoped>
+
+.crypto-title {
+    padding-left: 4em;
+    font-style: italic;
+}
 .crypto-cards {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
     gap: 20px;
+    padding-inline: 5em;
+    padding-top: 2em;
 }
 
 .crypto-card {
     flex-direction: column;
     align-items: center;
     padding: 20px;
-    border: 1px solid #ccc;
+    border: 2px solid #000000;
     border-radius: 5px;
     cursor: pointer;
     color: inherit;
     min-width: 200px;
+    background-color: #e0efff;
 }
 
 .crypto-image {
@@ -101,6 +109,11 @@ onMounted(async () => {
     height: 80px;
     object-fit: contain;
     margin-bottom: 10px;
+}
+
+.pagination {
+    padding-top: 3em;
+    padding-inline: 5em;
 }
 
 h2 {
